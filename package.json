@@ -1,0 +1,30 @@
+{
+  "name": "inxt-agent",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "bin": {
+    "inxt-agent": "dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "tsc -p tsconfig.json && node --test 'tests/*.test.mjs'",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@internxt/inxt-js": "3.3.5",
+    "@internxt/lib": "1.5.2",
+    "@internxt/sdk": "1.22.1",
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "bip39": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.5.0"
+  },
+  "description": "Agent access to Internxt Drive: E2EE CLI + MCP server (pi, hermes, Claude, any MCP client)",
+  "license": "MIT"
+}
