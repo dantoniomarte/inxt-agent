@@ -18,7 +18,7 @@ server — with no desktop app, no official CLI, and no rclone.
   Internxt's web client and was verified byte-for-byte against a real account.
 - **Agent-native contract** — one JSON object on stdout, structured errors on
   stderr with stable codes, stable exit codes, destructive operations double-gated.
-- **18 MCP tools** — annotated (`readOnlyHint` / `destructiveHint`), with
+- **18 MCP tools, any harness** — pi, [CC], Codex, OpenCode, OpenClaw, DeepSeek Harness, Gemini, Cursor, Windsurf, VS Code, or anything that speaks MCP — annotated (`readOnlyHint` / `destructiveHint`), with
   `confirm: true` required for anything irreversible.
 - **Resilient by default** — single-flight token rotation on 401, SDK backoff on
   rate limits, cursor pagination, TTL-cached path resolution.
@@ -113,21 +113,36 @@ $ inxt-agent ls Reports --json
 ]}
 ```
 
-## MCP server
+## Use it from any agent
+
+One stdio MCP server (`inxt`, 18 tools) and one JSON CLI. Print the exact config for your
+harness — no docs reading required:
 
 ```bash
-pi mcp add inxt -- node /path/to/inxt-agent-mcp.cjs
+node dist/cli/index.js setup --list                  # supported harnesses
+node dist/cli/index.js setup --client codex --json   # ready-to-paste config + target path
+node dist/cli/index.js setup --generic --json        # harness-agnostic descriptor
 ```
 
-Works with any MCP client (`command: node`, `args: [<repo>/inxt-agent-mcp.cjs]`).
-18 tools: `inxt_ls`, `inxt_upload`, `inxt_download`, `inxt_mv`, `inxt_rename`,
-`inxt_rm`, `inxt_trash_list`, `inxt_restore`, `inxt_purge`, `inxt_empty_trash`,
-`inxt_search`, `inxt_quota`, `inxt_mkdir`, `inxt_status`, `inxt_login`,
-`inxt_login_remote`, `inxt_login_complete`, `inxt_logout`.
+| Harness | One-liner |
+| --- | --- |
+| pi | `pi mcp add inxt -- node /abs/inxt-agent-mcp.cjs` |
+| [CC] | `claude mcp add --scope project inxt -- node /abs/inxt-agent-mcp.cjs` |
+| Codex CLI | `[mcp_servers.inxt]` in `~/.codex/config.toml` |
+| OpenCode | `mcp.inxt` in `opencode.json` (command is an array) |
+| OpenClaw | `openclaw mcp add inxt --command node --arg /abs/inxt-agent-mcp.cjs` |
+| DeepSeek Harness | `@deepseek-ai/dsh-mcp-client` entry in `cordis.patch.yml` |
+| Gemini CLI · Cursor · Windsurf | `mcpServers.inxt` in their settings file |
+| VS Code | `servers.inxt` in `.vscode/mcp.json` |
+| anything else | spawn `node /abs/inxt-agent-mcp.cjs`, speak MCP over stdio |
 
-Irreversible tools are annotated `destructiveHint: true` **and** require
-`confirm: true` in their arguments. Token expiry is handled automatically
-(one refresh + retry); a dead session surfaces as `AUTH_EXPIRED`.
+Full matrix and per-harness notes: [docs/clients.md](docs/clients.md). Machine-readable
+manifest for tooling: [docs/clients.json](docs/clients.json). Repo conventions for agents:
+[AGENTS.md](AGENTS.md).
+
+Irreversible tools are annotated `destructiveHint: true` **and** require `confirm: true`.
+Token expiry is handled automatically (one refresh + retry); a dead session surfaces as
+`AUTH_EXPIRED`.
 
 ## How it works
 
@@ -149,7 +164,7 @@ surface.
 ## Development
 
 ```bash
-npm test                        # 38 unit tests on fake HTTP servers
+npm test                        # 48 unit tests on fake HTTP servers
 bash scripts/e2e-sandbox.sh     # E2E round-trip against a REAL account,
                                 # inside a disposable sandbox folder (leaves it clean)
 ```

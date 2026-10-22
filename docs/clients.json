@@ -1,0 +1,237 @@
+{
+  "schema": "inxt-agent/integration/v1",
+  "name": "inxt-agent",
+  "version": "0.3.0",
+  "summary": "Agent access to Internxt Drive: E2EE transfers, CLI, and MCP server.",
+  "mcp": {
+    "name": "inxt",
+    "transport": "stdio",
+    "command": [
+      "node",
+      "inxt-agent-mcp.cjs"
+    ],
+    "protocol": "modelcontextprotocol",
+    "auth": "local-credentials",
+    "env": {}
+  },
+  "cli": {
+    "binary": "dist/cli/index.js",
+    "invoke": "node dist/cli/index.js <command> [args] [--json]",
+    "json_flag": "--json",
+    "exit_codes": {
+      "0": "ok",
+      "2": "auth required (run login)",
+      "4": "path not found / already exists",
+      "5": "invalid argument",
+      "6": "quota exceeded",
+      "7": "rate limited",
+      "8": "network error",
+      "9": "aborted",
+      "10": "crypto error",
+      "11": "local permissions",
+      "12": "confirmation required (--yes)",
+      "13": "server error"
+    }
+  },
+  "tools": [
+    {
+      "name": "inxt_status",
+      "description": "Session state (redacted) and storage quota",
+      "readOnly": true,
+      "destructive": false
+    },
+    {
+      "name": "inxt_login",
+      "description": "Authorize via browser (universal-link); opens a URL for the human",
+      "readOnly": false,
+      "destructive": false
+    },
+    {
+      "name": "inxt_login_remote",
+      "description": "Headless step 1: return the authorization URL",
+      "readOnly": true,
+      "destructive": false
+    },
+    {
+      "name": "inxt_login_complete",
+      "description": "Headless step 2: finish with the pasted callback URL",
+      "readOnly": false,
+      "destructive": false
+    },
+    {
+      "name": "inxt_logout",
+      "description": "Invalidate the session and wipe local credentials",
+      "readOnly": false,
+      "destructive": false
+    },
+    {
+      "name": "inxt_ls",
+      "description": "List a folder or stat a file",
+      "readOnly": true,
+      "destructive": false
+    },
+    {
+      "name": "inxt_search",
+      "description": "Server-side fuzzy search by name",
+      "readOnly": true,
+      "destructive": false
+    },
+    {
+      "name": "inxt_quota",
+      "description": "Account usage and limits",
+      "readOnly": true,
+      "destructive": false
+    },
+    {
+      "name": "inxt_mkdir",
+      "description": "Create a folder recursively",
+      "readOnly": false,
+      "destructive": false
+    },
+    {
+      "name": "inxt_upload",
+      "description": "Upload a local file (E2EE); confirm:true to overwrite",
+      "readOnly": false,
+      "destructive": false
+    },
+    {
+      "name": "inxt_download",
+      "description": "Download and decrypt a file",
+      "readOnly": false,
+      "destructive": false
+    },
+    {
+      "name": "inxt_mv",
+      "description": "Move and/or rename",
+      "readOnly": false,
+      "destructive": false
+    },
+    {
+      "name": "inxt_rename",
+      "description": "Rename in place",
+      "readOnly": false,
+      "destructive": false
+    },
+    {
+      "name": "inxt_rm",
+      "description": "Move to trash (recoverable); confirm:true",
+      "readOnly": false,
+      "destructive": true
+    },
+    {
+      "name": "inxt_trash_list",
+      "description": "List trashed items",
+      "readOnly": true,
+      "destructive": false
+    },
+    {
+      "name": "inxt_restore",
+      "description": "Restore a trashed item; confirm:true",
+      "readOnly": false,
+      "destructive": false
+    },
+    {
+      "name": "inxt_purge",
+      "description": "Permanently delete a trashed item; confirm:true (IRREVERSIBLE)",
+      "readOnly": false,
+      "destructive": true
+    },
+    {
+      "name": "inxt_empty_trash",
+      "description": "Empty the whole trash; confirm:true (IRREVERSIBLE)",
+      "readOnly": false,
+      "destructive": true
+    }
+  ],
+  "conventions": {
+    "json_flag": "--json",
+    "error_stream": "stderr",
+    "error_shape": "{ \"error\": { \"code\", \"message\", \"status?\", \"details?\" } }",
+    "destructive_gate": "confirm:true (MCP) / --yes (CLI)"
+  },
+  "docs": {
+    "integration": "docs/clients.md",
+    "manifest": "docs/clients.json",
+    "readme": "README.md",
+    "agents": "AGENTS.md"
+  },
+  "clients": [
+    {
+      "name": "pi",
+      "label": "pi (Gentle AI)",
+      "target": "~/.pi/agent/mcp.json  (or .pi/mcp.json for a trusted project)",
+      "format": "json",
+      "projectScoped": false
+    },
+    {
+      "name": "claude",
+      "label": "Claude Code",
+      "target": ".mcp.json (project scope) or ~/.claude.json",
+      "format": "json",
+      "projectScoped": true
+    },
+    {
+      "name": "codex",
+      "label": "Codex CLI",
+      "target": "~/.codex/config.toml (or .codex/config.toml per project)",
+      "format": "toml",
+      "projectScoped": false
+    },
+    {
+      "name": "opencode",
+      "label": "OpenCode",
+      "target": "opencode.json (project) or ~/.config/opencode/opencode.json",
+      "format": "json",
+      "projectScoped": true
+    },
+    {
+      "name": "openclaw",
+      "label": "OpenClaw",
+      "target": "OpenClaw MCP registry (run the command with the Gateway stopped)",
+      "format": "shell",
+      "projectScoped": false
+    },
+    {
+      "name": "deepseek",
+      "label": "DeepSeek Harness (dsh)",
+      "target": "cordis.patch.yml (profile patch layer)",
+      "format": "yaml",
+      "projectScoped": false
+    },
+    {
+      "name": "gemini",
+      "label": "Gemini CLI",
+      "target": "~/.gemini/settings.json (or .gemini/settings.json)",
+      "format": "json",
+      "projectScoped": false
+    },
+    {
+      "name": "cursor",
+      "label": "Cursor",
+      "target": ".cursor/mcp.json (project) or ~/.cursor/mcp.json",
+      "format": "json",
+      "projectScoped": true
+    },
+    {
+      "name": "windsurf",
+      "label": "Windsurf",
+      "target": "~/.codeium/windsurf/mcp_config.json",
+      "format": "json",
+      "projectScoped": false
+    },
+    {
+      "name": "vscode",
+      "label": "VS Code (Copilot agent mode)",
+      "target": ".vscode/mcp.json (project)",
+      "format": "json",
+      "projectScoped": true
+    },
+    {
+      "name": "generic",
+      "label": "Generic (any other agent / harness)",
+      "target": "stdout — harness-agnostic descriptor",
+      "format": "json",
+      "projectScoped": false
+    }
+  ]
+}

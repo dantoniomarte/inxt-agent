@@ -1,0 +1,20 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
+  "name": "io.github.dantoniomarte/inxt-agent",
+  "description": "Agent access to Internxt Drive: end-to-end encrypted list, upload, download, move, trash, restore, search and quota over MCP, plus a JSON CLI.",
+  "version": "0.3.0",
+  "repository": {
+    "url": "https://github.com/dantoniomarte/inxt-agent",
+    "source": "github"
+  },
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "inxt-agent",
+      "version": "0.3.0",
+      "transport": { "type": "stdio" }
+    }
+  ],
+  "keywords": ["internxt", "drive", "storage", "e2ee", "encryption", "cloud"],
+  "license": "MIT"
+}

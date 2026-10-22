@@ -4,6 +4,21 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [0.3.0] - 2026-10-21
+
+### Added
+- `setup` command: prints ready-to-paste MCP config for pi, [CC], Codex CLI, OpenCode,
+  OpenClaw, DeepSeek Harness, Gemini CLI, Cursor, Windsurf and VS Code
+  (`setup --list`, `setup --client <name>`, `setup --generic`).
+- Harness-agnostic integration descriptor (`setup --generic`) and the committed manifest
+  `docs/clients.json`, kept in sync by a test.
+- `AGENTS.md` (repo conventions for agents) and `docs/clients.md` (integration matrix).
+- `server.json` describing the package for MCP registries.
+
+### Changed
+- Dependencies refreshed through Dependabot: TypeScript 7, `@internxt/sdk` 1.23,
+  `@types/node` 26, `actions/checkout@v7`, `actions/setup-node@v7`.
+
 ## [0.2.0] - 2026-10-21
 
 ### Added

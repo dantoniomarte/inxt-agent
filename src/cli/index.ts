@@ -14,6 +14,7 @@ import { createWriteStream } from 'node:fs';
 import { loadConfig } from '../core/config.js';
 import { performLogin, performLogout, getSession, refreshSession, completeLoginFromCallbackUrl } from '../core/auth.js';
 import { buildLoginUrl } from '../core/login.js';
+import { buildConfig, listClients, packageRoot, CLIENTS } from './setup.js';
 import { redactCredentials, hasCredentials } from '../core/credentials.js';
 import { DriveRepo } from '../core/drive.js';
 import { TransferEngine, splitName } from '../transfer/engine.js';
@@ -26,6 +27,10 @@ interface ParsedArgs {
   port: number;
   yes: boolean;
   remote: boolean;
+  client?: string;
+  generic: boolean;
+  print: boolean;
+  list: boolean;
   help: boolean;
 }
 
@@ -38,12 +43,20 @@ function parseArgs(argv: string[]): ParsedArgs {
   } else {
     rest = rest.slice(1);
   }
-  const parsed: ParsedArgs = { command, positional: [], json: false, port: 0, yes: false, remote: false, help: false };
+  const parsed: ParsedArgs = { command, positional: [], json: false, port: 0, yes: false, remote: false, generic: false, print: false, list: false, help: false };
   for (let i = 0; i < rest.length; i++) {
     const a = rest[i] as string;
     if (a === '--json') parsed.json = true;
     else if (a === '--yes') parsed.yes = true;
     else if (a === '--remote') parsed.remote = true;
+    else if (a === '--generic') parsed.generic = true;
+    else if (a === '--print') parsed.print = true;
+    else if (a === '--list') parsed.list = true;
+    else if (a === '--client') {
+      const v = rest[++i];
+      if (!v || v.startsWith('--')) throw new AgentError('INVALID_ARGUMENT', '--client expects a client name (try: inxt-agent setup --list)');
+      parsed.client = v;
+    }
     else if (a === '--help' || a === '-h') parsed.help = true;
     else if (a === '--port') {
       const v = Number(rest[++i]);
@@ -423,7 +436,27 @@ async function cmdSearch(args: ParsedArgs): Promise<Record<string, unknown>> {
   return { term, items: results.map((f) => ({ uuid: f.uuid, name: f.name, kind: f.kind, size: f.size })) };
 }
 
+async function cmdSetup(args: ParsedArgs): Promise<Record<string, unknown>> {
+  if (args.list) return { clients: listClients() };
+  const name = args.client ?? (args.generic ? 'generic' : undefined);
+  if (!name) {
+    throw new AgentError(
+      'INVALID_ARGUMENT',
+      'usage: inxt-agent setup (--client <name> | --generic | --list) [--json]. ' +
+        `Known clients: ${Object.keys(CLIENTS).join(', ')}`,
+    );
+  }
+  if (!CLIENTS[name]) {
+    throw new AgentError('INVALID_ARGUMENT', `Unknown client "${name}". Known: ${Object.keys(CLIENTS).join(', ')}`);
+  }
+  const built = buildConfig(name, packageRoot());
+  // The generic descriptor IS the payload: return it flat so any agent can consume it directly.
+  if (name === 'generic') return built.config as Record<string, unknown>;
+  return built as unknown as Record<string, unknown>;
+}
+
 function runCommand(args: ParsedArgs): Promise<Record<string, unknown>> {
+  if (args.command === 'setup') return cmdSetup(args);
   switch (args.command) {
     case 'login':
       return cmdLogin(args);
@@ -481,6 +514,7 @@ async function main(): Promise<number> {
         emptytrash: 'Empty the whole trash (IRREVERSIBLE). usage: emptytrash --yes',
         quota: 'Show account usage/limits.',
         search: 'Search files by name. usage: inxt-agent search <term>',
+        setup: 'Print MCP integration config for an agent. usage: inxt-agent setup (--client <name> | --generic | --list) [--json]',
       },
     };
     if (args.json) console.log(JSON.stringify(help));
