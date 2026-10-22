@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.6.5",
-    "typescript": "^5.5.0"
+    "typescript": "^7.0.2"
   },
   "description": "Agent access to Internxt Drive: E2EE CLI + MCP server (pi, hermes, Claude, any MCP client)",
   "license": "MIT"
