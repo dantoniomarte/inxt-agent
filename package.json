@@ -22,7 +22,7 @@
     "bip39": "^3.1.0"
   },
   "devDependencies": {
-    "@types/node": "^26.6.5",
+    "@types/node": "^26.6.6",
     "typescript": "^7.0.2"
   },
   "description": "Agent access to Internxt Drive: E2EE CLI + MCP server (pi, hermes, Claude, any MCP client)",
